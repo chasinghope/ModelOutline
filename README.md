@@ -2,11 +2,11 @@
 
 
 
+https://zhuanlan.zhihu.com/p/306060840
 
 
 
-
-法线外扩
+## 法线外扩
 
 ```c
         _Thickness ("Thickness", Float) = 1 // The amount to extrude the outline mesh
@@ -84,7 +84,7 @@
 
 
 
-菲涅耳
+# 菲涅耳
 
 ```c
 Shader "Universal Render Pipeline/fneOutlines"
@@ -94,9 +94,6 @@ Shader "Universal Render Pipeline/fneOutlines"
         [MainTexture] _BaseMap("Albedo", 2D) = "white" {}
         [MainColor] _BaseColor("Color", Color) = (1,1,1,1)
 
-
-        _Thickness ("Thickness", Float) = 1 // The amount to extrude the outline mesh
-        _OtColor ("OtColor", Color) = (1, 1, 1, 1) // The outline color
         _FresnalColor("FresnalColor", color) = (1,1,1,0)
         _FresnalScale("FresnalScale", float) = 1
     }

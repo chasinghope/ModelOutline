@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/normalOutlineLit"
+Shader "Universal Render Pipeline/OutLineNormalEx"
 {
     Properties
     {
@@ -72,11 +72,8 @@ Shader "Universal Render Pipeline/normalOutlineLit"
         [HideInInspector][NoScaleOffset]unity_LightmapsInd("unity_LightmapsInd", 2DArray) = "" {}
         [HideInInspector][NoScaleOffset]unity_ShadowMasks("unity_ShadowMasks", 2DArray) = "" {}
 
-
         _Thickness ("Thickness", Float) = 1 // The amount to extrude the outline mesh
         _OtColor ("Color", Color) = (1, 1, 1, 1) // The outline color
-        _FresnalColor("FresnalColor", color) = (1,1,1,0)
-        _FresnalScale("FresnalScale", float) = 1
     }
 
     SubShader
@@ -475,10 +472,9 @@ Shader "Universal Render Pipeline/normalOutlineLit"
             ENDHLSL
         }
     
-    
         Pass 
         {
-            Name "Outlines"
+            Name "OutlineNormal"
             // Cull front faces
             Cull Front
 
@@ -507,9 +503,6 @@ Shader "Universal Render Pipeline/normalOutlineLit"
             {
                 float4 positionOS : POSITION;
                 float3 normalOS : NORMAL;
-            #ifdef USE_PRECALCULATED_OUTLINE_NORMALS
-                float3 smoothNormalOS   : TEXCOORD1; // Calculated "smooth" normals to extrude along in object space
-            #endif
             };
 
             struct VertexOutput
@@ -523,11 +516,7 @@ Shader "Universal Render Pipeline/normalOutlineLit"
                 VertexOutput output = (VertexOutput) 0;
 
                 float3 normalOS = input.normalOS;
-            #ifdef USE_PRECALCULATED_OUTLINE_NORMALS
-                normalOS = input.smoothNormalOS;
-            #else
                 normalOS = input.normalOS;
-            #endif
 
                 // Extrude the object space position along a normal vector
                 float3 posOS = input.positionOS.xyz + normalOS * _Thickness;
@@ -543,9 +532,9 @@ Shader "Universal Render Pipeline/normalOutlineLit"
 
             ENDHLSL
         }
-
-
+        
     }
 
     FallBack "Hidden/Universal Render Pipeline/FallbackError"
+    //CustomEditor "UnityEditor.Rendering.Universal.ShaderGUI.LitShader"
 }
