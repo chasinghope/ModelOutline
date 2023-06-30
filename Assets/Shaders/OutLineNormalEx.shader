@@ -72,7 +72,7 @@ Shader "Universal Render Pipeline/OutLineNormalEx"
         [HideInInspector][NoScaleOffset]unity_LightmapsInd("unity_LightmapsInd", 2DArray) = "" {}
         [HideInInspector][NoScaleOffset]unity_ShadowMasks("unity_ShadowMasks", 2DArray) = "" {}
 
-        _Thickness ("Thickness", Float) = 1 // The amount to extrude the outline mesh
+        _Thickness ("Thickness", Float) = 0.01 // The amount to extrude the outline mesh
         _OtColor ("Color", Color) = (1, 1, 1, 1) // The outline color
     }
 
