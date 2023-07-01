@@ -15,6 +15,9 @@
 #define REQUIRES_WORLD_SPACE_TANGENT_INTERPOLATOR
 #endif
 
+#ifndef REQUIRES_WORLD_SPACE_POS_INTERPOLATOR
+#define REQUIRES_WORLD_SPACE_POS_INTERPOLATOR
+#endif
 // Code
 half4 _FresnalColor;
 float _FresnalScale;
@@ -250,23 +253,13 @@ void LitPassFragment(
     color.rgb = MixFog(color.rgb, inputData.fogCoord);
     color.a = OutputAlpha(color.a, IsSurfaceTypeTransparent(_Surface));
 
+    float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - input.positionWS);
     
-    half remapX = remap(input.uv.x, 0, 1.0, -1.0, 1.0);
-    half remapY = remap(input.uv.y, 0, 1.0, -1.0, 1.0);
-    
-    //菲涅尔近似公式的算法需要标量
-    half3 worldNor = normalize(input.normalWS);
-    half3 worViewDir = normalize(input.worldDir);
-    //计算菲涅尔系数
-    half fres = pow(dot(worViewDir, worldNor), 0.5);
+    float k = ceil((pow(dot(normalize(viewDir), normalize(input.normalWS)), _FresnalScale) * 2.0 + -1.0));
+    float3 finalColor = k * _FresnalColor.rgb;
 
-    //菲涅尔系数乘以菲涅尔的颜色,
-    //通过菲涅尔系数，边缘部分会有颜色显示，边缘之外则无颜色，调节_FresnalScale，颜色会向中央蔓延
-    //通过Remap函数，重映射，输入_SinTime等。用来控制自发光的强度，即变相调节_FresnalScale
-    half3 fresCol = _FresnalColor * fres * remap(_SinTime, -1, 1, 0.2, 1);
-    
-    outColor = color + half4(fresCol, 1);
-
+    outColor = color * k + (1 - k) * _FresnalColor;
+    //outColor = half4(finalColor, 1);
 #ifdef _WRITE_RENDERING_LAYERS
     uint renderingLayers = GetMeshRenderingLayer();
     outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);

@@ -4,6 +4,10 @@
 
 https://zhuanlan.zhihu.com/p/306060840
 
+https://zhuanlan.zhihu.com/p/446473650
+
+只是外边缘描边的话可以直接用深度图卷积来做，就是深度变化大的地方会被检测为边缘
+
 
 
 ## 法线外扩
@@ -191,5 +195,65 @@ Shader "Universal Render Pipeline/fneOutlines"
     FallBack "Hidden/Universal Render Pipeline/FallbackError"
 }
 
+```
+
+```
+Properties {
+        _FresnelPow ("FresnelPow", Range(0, 1)) = 0.5
+    }
+    SubShader {
+        Tags {
+            "RenderType"="Opaque"
+        }
+        Pass {
+            Name "FORWARD"
+            Tags {
+                "LightMode"="ForwardBase"
+            }
+            
+            
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma multi_compile_instancing
+            #include "UnityCG.cginc"
+            #pragma multi_compile_fwdbase_fullshadows
+            #pragma target 3.0
+            UNITY_INSTANCING_BUFFER_START( Props )
+                UNITY_DEFINE_INSTANCED_PROP( float, _FresnelPow)
+            UNITY_INSTANCING_BUFFER_END( Props )
+            struct VertexInput {
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+            struct VertexOutput {
+                float4 pos : SV_POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                float4 posWorld : TEXCOORD0;
+                float3 normalDir : TEXCOORD1;
+            };
+            VertexOutput vert (VertexInput v) {
+                VertexOutput o = (VertexOutput)0;
+                UNITY_SETUP_INSTANCE_ID( v );
+                UNITY_TRANSFER_INSTANCE_ID( v, o );
+                o.normalDir = UnityObjectToWorldNormal(v.normal);
+                o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+                o.pos = UnityObjectToClipPos( v.vertex );
+                return o;
+            }
+            float4 frag(VertexOutput i) : COLOR {
+                UNITY_SETUP_INSTANCE_ID( i );
+                i.normalDir = normalize(i.normalDir);
+                float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
+                float3 normalDirection = i.normalDir;
+
+                float _FresnelPow_var = UNITY_ACCESS_INSTANCED_PROP( Props, _FresnelPow );
+                float node_2909 = ceil((pow(dot(i.normalDir,viewDirection),_FresnelPow_var)*2.0+-1.0));
+                float3 emissive = float3(node_2909,node_2909,node_2909);
+                float3 finalColor = emissive;
+                return fixed4(finalColor,1);
+            }
+            ENDCG
 ```
 
