@@ -18,6 +18,10 @@
 #ifndef REQUIRES_WORLD_SPACE_POS_INTERPOLATOR
 #define REQUIRES_WORLD_SPACE_POS_INTERPOLATOR
 #endif
+             
+//#ifndef _OUTLINE
+//#define _OUTLINE
+//#endif
 // Code
 half4 _FresnalColor;
 float _FresnalScale;
@@ -258,8 +262,12 @@ void LitPassFragment(
     float k = ceil((pow(dot(normalize(viewDir), normalize(input.normalWS)), _FresnalScale) * 2.0 + -1.0));
     float3 finalColor = k * _FresnalColor.rgb;
 
+#if defined(_OUTLINE)
     outColor = color * k + (1 - k) * _FresnalColor;
-    //outColor = half4(finalColor, 1);
+#else
+    outColor = color;
+#endif
+    
 #ifdef _WRITE_RENDERING_LAYERS
     uint renderingLayers = GetMeshRenderingLayer();
     outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);

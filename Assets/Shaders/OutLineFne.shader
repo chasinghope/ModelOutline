@@ -74,6 +74,7 @@ Shader "Universal Render Pipeline/OutLineFne"
 
         _FresnalColor("FresnalColor", color) = (1,1,1,0)
         _FresnalScale("FresnalScale", float) = 1
+        [Toggle] _OUTLINE ("OUTLINE", Float) = 0.0
     }
 
     SubShader
@@ -134,6 +135,8 @@ Shader "Universal Render Pipeline/OutLineFne"
             #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
             #pragma shader_feature_local_fragment _SPECULAR_SETUP
 
+//            #pragma multi_compile_local _OUTLINE
+            #pragma shader_feature_local _OUTLINE
             // -------------------------------------
             // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
@@ -361,6 +364,7 @@ Shader "Universal Render Pipeline/OutLineFne"
             Cull[_Cull]
 
             HLSLPROGRAM
+
             #pragma target 2.0
 
             // -------------------------------------

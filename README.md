@@ -197,7 +197,7 @@ Shader "Universal Render Pipeline/fneOutlines"
 
 ```
 
-```
+```c
 Properties {
         _FresnelPow ("FresnelPow", Range(0, 1)) = 0.5
     }
